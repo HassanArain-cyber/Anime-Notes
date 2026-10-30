@@ -153,8 +153,11 @@
       await navigator.serviceWorker.ready;
       const files = ['index.html', 'anime.html', 'trash.html', 'style.css', 'db.js', 'app.js', 'anime.js', 'trash.js', 'manifest.json'];
       await Promise.all(files.map(f => fetch(f).catch(() => 0))); // saves a copy of each file for offline use
-      const hits = await Promise.all(['/', '/anime', '/trash', '/db.js', '/app.js', '/anime.js', '/trash.js', '/style.css'].map(p => caches.match(location.origin + p)));
-      note(hits.every(Boolean) ? 'Offline mode: ready ✓' : 'Offline mode: not ready yet. Reopen the app once while online.');
+      const base = new URL('./', location.href).href; // works at the site root and in a sub-folder (GitHub Pages)
+      const keys = ['', 'anime', 'trash', 'db.js', 'app.js', 'anime.js', 'trash.js', 'style.css'];
+      const hits = await Promise.all(keys.map(k => caches.match(base + k)));
+      const missing = keys.filter((k, i) => !hits[i]).map(k => k || 'index');
+      note(missing.length ? 'Offline mode: not ready (missing: ' + missing.join(', ') + '). Reopen once while online.' : 'Offline mode: ready ✓');
     } catch (e) { note('Offline mode failed: ' + e.message); }
   })();
 })();
