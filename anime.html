@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="theme-color" content="#000000">
+<title>Anime Details</title>
+<link rel="manifest" href="manifest.json">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top-bar detail-bar">
+    <button id="btnBack" class="back-btn">← Back</button>
+    <div class="detail-actions">
+      <button id="btnEditAnime" title="Edit">✏️</button>
+      <button id="btnDelAnime" title="Delete">🗑</button>
+    </div>
+  </header>
+
+  <main id="detailMain" class="detail-main">
+    <div class="detail-header">
+      <h1 id="detailName"></h1>
+      <div id="detailRating" class="detail-rating"></div>
+    </div>
+    <div class="detail-meta">
+      <span id="detailDate"></span>
+    </div>
+
+    <div class="char-section">
+      <div class="char-header">
+        <span>Characters</span>
+        <div class="char-actions">
+          <button id="btnAddChar" title="Add">➕</button>
+          <button id="btnEditChars" title="Edit">✏️</button>
+          <button id="btnDelChars" title="Delete">🗑</button>
+        </div>
+      </div>
+      <ul id="charList" class="char-list"></ul>
+      <div id="charEmpty" class="empty hidden"><p>No characters yet.</p></div>
+    </div>
+  </main>
+</div>
+
+<!-- Add Characters Modal -->
+<div id="addCharModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="addCharBack">←</button>
+      <span class="modal-title">Add Characters</span>
+      <button class="save-btn" id="addCharSave">Save</button>
+    </div>
+    <div class="modal-body">
+      <label>Character names (one per line)</label>
+      <textarea id="addCharInput" rows="10" placeholder="Gojo&#10;Sukuna&#10;Toji&#10;Nanami"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Characters Modal -->
+<div id="editCharModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="editCharBack">←</button>
+      <span class="modal-title">Edit Characters</span>
+      <button class="save-btn" id="editCharSave">Save</button>
+    </div>
+    <div class="modal-body">
+      <label>Edit all characters (one per line)</label>
+      <textarea id="editCharInput" rows="12"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Characters Modal -->
+<div id="delCharModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="delCharBack">←</button>
+      <span class="modal-title">Delete Characters</span>
+      <button class="save-btn danger" id="delCharConfirm">Delete Selected</button>
+    </div>
+    <div class="modal-body">
+      <div id="delCharList" class="check-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Anime Modal -->
+<div id="editAnimeModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="editAnimeBack">←</button>
+      <span class="modal-title">Edit Anime</span>
+      <button class="save-btn" id="editAnimeSave">Save</button>
+    </div>
+    <div class="modal-body">
+      <label>Anime Name</label>
+      <input type="text" id="editAnimeName" autocomplete="off">
+      <label>Rating</label>
+      <input type="number" id="editAnimeRating" min="0" max="10" step="0.1" placeholder="0-10">
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content confirm">
+    <p id="confirmText">Are you sure?</p>
+    <div class="confirm-btns">
+      <button id="confirmNo">Cancel</button>
+      <button id="confirmYes" class="danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="db.js"></script>
+<script src="anime.js"></script>
+</body>
+</html>

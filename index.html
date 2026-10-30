@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; connect-src 'self'; img-src 'self' data:; style-src 'self'; object-src 'none'; base-uri 'none'; form-action 'self'">
+<meta name="theme-color" content="#000000">
+<title>Anime Notes</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icon-192.png">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+  <header class="top-bar">
+    <div class="search-wrap">
+      <input type="text" id="searchInput" placeholder="🔍 Search..." autocomplete="off">
+    </div>
+    <div class="actions">
+      <button id="btnSort" title="Sort">⇅</button>
+      <button id="btnAdd" title="Add Anime">➕</button>
+      <button id="btnImport" title="Import">📥</button>
+      <button id="btnExport" title="Export">📤</button>
+      <button id="btnDelAll" title="Delete all">🧹</button>
+      <button id="btnTrash" title="Trash">🗑</button>
+    </div>
+  </header>
+
+  <div id="sortPanel" class="panel hidden">
+    <div class="panel-title">Sort By</div>
+    <div class="sort-options">
+      <button data-sort="newest">Newest First</button>
+      <button data-sort="oldest">Oldest First</button>
+      <button data-sort="ratingHigh">Highest Rating</button>
+      <button data-sort="ratingLow">Lowest Rating</button>
+      <button data-sort="az">A → Z</button>
+      <button data-sort="za">Z → A</button>
+    </div>
+  </div>
+
+  <div id="backupNote" class="sync"></div>
+  <div id="offlineNote" class="sync"></div>
+
+  <main id="animeList" class="anime-list"></main>
+
+  <div id="emptyState" class="empty hidden">
+    <p>No anime yet. Tap ➕ to add one.</p>
+  </div>
+</div>
+
+<!-- Add Anime Modal -->
+<div id="addModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="addBack">←</button>
+      <span class="modal-title">Add Anime</span>
+      <button class="save-btn" id="addSave">Save</button>
+    </div>
+    <div class="modal-body">
+      <label>Anime Name <span class="req">*</span></label>
+      <input type="text" id="addName" maxlength="200" placeholder="e.g. Jujutsu Kaisen" autocomplete="off">
+      <label>Rating (optional)</label>
+      <input type="number" id="addRating" min="0" max="10" step="0.1" placeholder="0-10">
+      <label>Characters (one per line, optional)</label>
+      <textarea id="addChars" rows="6" placeholder="Gojo&#10;Sukuna&#10;Toji"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- Import Modal -->
+<div id="importModal" class="modal hidden">
+  <div class="modal-content">
+    <div class="modal-header">
+      <button class="back-btn" id="importBack">←</button>
+      <span class="modal-title">Import</span>
+    </div>
+    <div class="modal-body">
+      <label>Upload file (TXT or JSON backup)</label>
+      <input type="file" id="importFile" accept=".txt,.json">
+      <div class="or">— or paste text —</div>
+      <textarea id="importText" rows="8" placeholder="1. Jujutsu Kaisen&#10;   • Gojo&#10;   • Sukuna&#10;&#10;2. Spy X Family&#10;   • Yor&#10;   • Anya"></textarea>
+      <button class="full-btn" id="importBtn">Import</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Modal -->
+<div id="confirmModal" class="modal hidden">
+  <div class="modal-content confirm">
+    <p id="confirmText">Are you sure?</p>
+    <div class="confirm-btns">
+      <button id="confirmNo">Cancel</button>
+      <button id="confirmYes" class="danger">Delete</button>
+    </div>
+  </div>
+</div>
+
+<script src="db.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
