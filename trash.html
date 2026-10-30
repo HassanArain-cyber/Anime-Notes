@@ -14,8 +14,16 @@
   <header class="top-bar detail-bar">
     <button id="btnBack" class="back-btn">← Back</button>
     <span class="page-title">Trash</span>
-    <button id="btnEmptyTrash" class="danger-btn" title="Empty Trash">🗑</button>
+    <span></span>
   </header>
+
+  <div id="trashTools" class="panel hidden">
+    <div class="panel-title">Items here are deleted for good after 15 days.</div>
+    <div class="confirm-btns">
+      <button id="btnRestoreAll">Restore all</button>
+      <button id="btnEmptyTrash" class="danger">Delete all</button>
+    </div>
+  </div>
 
   <main id="trashList" class="anime-list"></main>
   <div id="emptyState" class="empty hidden">

@@ -7,6 +7,7 @@
 
   function render() {
     $('trashList').classList.toggle('hidden', !items.length);
+    $('trashTools').classList.toggle('hidden', !items.length);
     $('emptyState').classList.toggle('hidden', !!items.length);
     $('trashList').replaceChildren(...items.map(item => {
       const el = document.createElement('div'); el.className = 'trash-item';
@@ -31,8 +32,15 @@
 
   $('btnBack').onclick = () => { location.href = 'index.html'; };
   $('confirmNo').onclick = () => closeModal($('confirmModal'));
+  $('btnRestoreAll').onclick = () => items.length && confirm(
+    'Restore all ' + items.length + ' items to your list?', 'Restore all',
+    async () => {
+      const rows = await getRows(), now = Date.now();
+      rows.forEach(r => { if (r.deleted_at) { r.deleted_at = null; r.updated = now; } });
+      await save(rows); items = []; render();
+    });
   $('btnEmptyTrash').onclick = () => items.length && confirm(
-    'Permanently delete all ' + items.length + ' items in trash?', 'Empty Trash',
+    'Permanently delete all ' + items.length + ' items in Trash? This cannot be undone.', 'Delete all',
     async () => { await emptyTrash(); items = []; render(); });
 
   render();

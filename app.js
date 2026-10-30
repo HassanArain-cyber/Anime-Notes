@@ -62,6 +62,12 @@
   $('addSave').onclick = async () => {
     const name = cleanName($('addName').value);
     if (!name) return $('addName').focus();
+    const key = name.toLowerCase();
+    if (allAnime.some(a => a.name.toLowerCase() === key)) {
+      if (!confirm('"' + name + '" is already in your list. Add it again anyway?')) return;
+    } else if ((await getAllTrash()).some(a => a.name.toLowerCase() === key)) {
+      if (!confirm('"' + name + '" is already in your Trash. Add it anyway?\n\nTip: you can restore it from 🗑 Trash instead.')) return;
+    }
     $('addSave').disabled = true;
     try {
       const [row] = await addAnime([{
@@ -112,6 +118,29 @@
     return parseText(text);
   }
 
+  function buildRows(list, seen, now) {
+    const rows = [];
+    list.forEach((a, i) => {
+      const name = cleanName(a.name), key = name.toLowerCase();
+      if (!name || seen.has(key)) return;
+      seen.add(key);
+      const c = Math.floor(+a.created), u = Math.floor(+a.updated);
+      rows.push({
+        name, rating: cleanRating(a.rating), characters: cleanChars(a.characters),
+        created: Number.isSafeInteger(c) && c > 0 ? c : now + i,
+        updated: Number.isSafeInteger(u) && u > 0 ? u : now + i,
+      });
+    });
+    return rows;
+  }
+
+  function skipSummary(list, active, trashed) {
+    const key = a => cleanName(a.name).toLowerCase();
+    const inList = list.filter(a => active.has(key(a))).length;
+    const inTrash = list.filter(a => !active.has(key(a)) && trashed.has(key(a))).length;
+    return [inList && inList + ' already in your list', inTrash && inTrash + ' already in Trash (open 🗑 Trash to restore or delete them)'].filter(Boolean).join(', ');
+  }
+
   async function readImportFile(file) {
     const buf = new Uint8Array(await file.arrayBuffer());
     if (buf[0] === 0x1f && buf[1] === 0x8b) { // .gz (MyAnimeList exports are gzip-compressed)
@@ -139,22 +168,13 @@
     } catch (e) { return alert('Could not read this file: ' + e.message); }
     list = (Array.isArray(list) ? list : []).filter(a => a && typeof a === 'object').slice(0, 5000);
 
-    // skip anime that are already in the app (same name)
-    const seen = new Set([...await getAllAnime(), ...await getAllTrash()].map(r => r.name.toLowerCase()));
-    const now = Date.now(), rows = [];
-    list.forEach((a, i) => {
-      const name = cleanName(a.name), key = name.toLowerCase();
-      if (!name || seen.has(key)) return;
-      seen.add(key);
-      const c = Math.floor(+a.created), u = Math.floor(+a.updated);
-      rows.push({
-        name, rating: cleanRating(a.rating), characters: cleanChars(a.characters),
-        created: Number.isSafeInteger(c) && c > 0 ? c : now + i,
-        updated: Number.isSafeInteger(u) && u > 0 ? u : now + i,
-      });
-    });
+    // skip anime that are already in the list or in Trash (same name) and say which
+    const active = new Set((await getAllAnime()).map(r => r.name.toLowerCase()));
+    const trashed = new Set((await getAllTrash()).map(r => r.name.toLowerCase()));
+    const rows = buildRows(list, new Set([...active, ...trashed]), Date.now());
+    const skipped = skipSummary(list, active, trashed);
     if (!rows.length) return alert(list.length
-      ? 'Nothing new to import: all ' + list.length + ' are already in your list.'
+      ? 'Nothing imported. ' + (skipped || 'No valid anime names found') + '.'
       : 'No anime found in this file. Supported: JSON backup, text list, MyAnimeList XML.');
 
     $('importBtn').disabled = true;
@@ -164,7 +184,7 @@
       refresh();
       $('importText').value = $('importFile').value = '';
       closeModal($('importModal'));
-      alert(rows.length + ' anime imported' + (list.length > rows.length ? ', ' + (list.length - rows.length) + ' skipped (already in your list)' : '') + '.');
+      alert(rows.length + ' anime imported' + (skipped ? '. Skipped: ' + skipped : '') + '.');
     } finally { $('importBtn').disabled = false; }
   };
 
