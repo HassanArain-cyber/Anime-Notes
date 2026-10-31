@@ -207,7 +207,12 @@
 
   // Turn on offline mode and show whether it really works
   (async () => {
-    const note = t => { $('offlineNote').textContent = t; };
+    let problem = ''; // shows a warning if offline mode has a problem, otherwise just Online / Offline
+    const show = () => { $('offlineNote').textContent = problem || (navigator.onLine ? 'Online' : 'Offline'); };
+    const note = t => { problem = t; show(); };
+    window.addEventListener('online', show);
+    window.addEventListener('offline', show);
+    show();
     try {
       if (!('serviceWorker' in navigator)) return note('Offline mode is not supported in this browser.');
       await navigator.serviceWorker.register('service-worker.js');
@@ -220,7 +225,7 @@
       const keys = ['', 'anime', 'trash', 'db.js', 'app.js', 'anime.js', 'trash.js', 'style.css'];
       const hits = await Promise.all(keys.map(k => caches.match(base + k)));
       const missing = keys.filter((k, i) => !hits[i]).map(k => k || 'index');
-      note(missing.length ? 'Offline mode: not ready (missing: ' + missing.join(', ') + '). Reopen once while online.' : 'Offline mode: ready ✓');
+      note(missing.length ? 'Offline mode: not ready (missing: ' + missing.join(', ') + '). Reopen once while online.' : '');
     } catch (e) { note('Offline mode failed: ' + e.message); }
   })();
 })();
